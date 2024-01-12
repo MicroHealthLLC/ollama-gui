@@ -42,6 +42,10 @@ onMounted(() => {
 })
 </script>
 
+<style>
+  @import './components/Inputs/DropZoneStyle.css';
+</style>
+
 <template>
   <div :class="{ dark: isDarkMode }">
     <main

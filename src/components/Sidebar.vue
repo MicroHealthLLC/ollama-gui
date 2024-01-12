@@ -102,7 +102,7 @@ const onNewChat = () => {
         >
           <IconSettings2 class="h-6 w-6" />
 
-          Settings
+          Documents
         </button>
       </div>
     </div>

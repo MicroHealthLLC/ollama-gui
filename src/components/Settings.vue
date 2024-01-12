@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { IconLayoutSidebarRightCollapse } from '@tabler/icons-vue'
-import ToggleInput from './Inputs/ToggleInput.vue'
-import TextInput from './Inputs/TextInput.vue'
 import {
   baseUrl,
   debugMode,
@@ -9,6 +7,20 @@ import {
   isSettingsOpen,
   toggleSettingsPanel,
 } from '../services/appConfig.ts'
+
+import useFileList from './file-list'
+import DropZone from './Inputs/DropZone.vue'
+import  FilePreview  from  './Inputs/FilePreview.vue'
+
+const { files, addFiles, removeFile } = useFileList()
+
+function onInputChange(e) {
+    addFiles(e.target.files)
+    e.target.value = null
+}
+
+import  createUploader  from  './Inputs/file-uploader'
+const { uploadFiles } = createUploader('')
 </script>
 
 <template>
@@ -25,62 +37,30 @@ import {
 
           <span class="sr-only">Close settings sidebar</span>
         </button>
-        <h2 class="text-lg font-medium">Settings</h2>
+        <h2 class="text-lg font-medium">Documents</h2>
       </div>
 
-      <!-- More Settings -->
-      <div
-        class="my-4 border-t border-zinc-300 px-2 py-4 text-zinc-800 dark:border-zinc-700 dark:text-zinc-200"
-      >
-        <div>
-          <ToggleInput label="Enable debug mode" v-model="debugMode" />
-        </div>
 
-        <TextInput label="Base URL" v-model="baseUrl" />
+              <DropZone class="drop-area" @files-dropped="addFiles" #default="{ dropZoneActive }">
+                <label for="file-input">
+                  <span v-if="dropZoneActive">
+                      <span>Drop Them Here</span>
+                      <span class="smaller">to add them</span>
+                  </span>
+                  <span v-else>
+                      <span>Drag Your Files Here</span>
+                      <span class="smaller">
+                          or <strong><em>click here</em></strong> to select files
+                      </span>
+                  </span>
 
-        <TextInput label="Gravatar Email" v-model="gravatarEmail" />
-
-        <div v-if="false">
-          <div>
-            <label for="max-tokens" class="mb-2 mt-4 block px-2 text-sm font-medium">
-              Max tokens
-            </label>
-            <input
-              type="number"
-              disabled
-              id="max-tokens"
-              class="block w-full rounded-lg bg-zinc-200 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-zinc-800 dark:placeholder-zinc-400 dark:focus:ring-blue-600"
-              placeholder="2048"
-            />
-          </div>
-
-          <div>
-            <label for="temperature" class="mb-2 mt-4 block px-2 text-sm font-medium">
-              Temperature
-            </label>
-            <input
-              type="number"
-              disabled
-              id="temperature"
-              class="block w-full rounded-lg bg-zinc-200 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-zinc-800 dark:placeholder-zinc-400 dark:focus:ring-blue-600"
-              placeholder="0.7"
-            />
-          </div>
-
-          <div>
-            <label for="top-p" class="mb-2 mt-4 block px-2 text-sm font-medium">
-              Top P
-            </label>
-            <input
-              type="number"
-              disabled
-              id="top-p"
-              class="block w-full rounded-lg bg-zinc-200 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-zinc-800 dark:placeholder-zinc-400 dark:focus:ring-blue-600"
-              placeholder="1"
-            />
-          </div>
-        </div>
-      </div>
+                  <input type="file" id="file-input" multiple @change="onInputChange" />
+                </label>
+                <ul class="image-list" v-show="files.length">
+                    <FilePreview  v-for="file  of  files" :key="file.id" :file="file"  tag="li" @remove="removeFile" />
+                </ul>
+                <button @click.prevent="uploadFiles(files)"  class="upload-button">Upload</button>
+              </DropZone>
     </div>
   </aside>
 </template>
